@@ -2,6 +2,7 @@
 """自定义spider测试"""
 from scrapy_option.core.spider import Spider
 from scrapy_option.http.request import Request
+from scrapy_option.item import Item
 
 
 class BaiduSpider(Spider):
@@ -26,4 +27,7 @@ class DoubanSpider(Spider):
         for node in response.xpath("//div[@class='hd']"):
             title = node.xpath(".//span[@class='title'][1]/text()")[0]
             link = node.xpath("./a/@href")[0]
-            yield Request(link, headers=self.headers)
+            yield Request(link, headers=self.headers, parse="parse_ext")
+
+    def parse_next(self, response):
+        yield Item(response.xpath("//title/text()")[0].strip())

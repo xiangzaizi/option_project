@@ -80,10 +80,13 @@ class Engine(object):
             response = self.downloader_middlewares.process_response(response)
 
             # 5. 得到响应对象交给spider解析数据
-            results = self.spider.parse(response)
-            # result = self.spider.parse_request(response)
-            for result in results:
+            # results = self.spider.parse(response)
+            # 1.request.parse--->取parse对应的解析方法
+            parse_func = getattr(self.spider, request.parse)
+            # 2.使用parse_next(处理响应)
+            results = parse_func(response)
 
+            for result in results:
                 # 6. 判断解析出来的结果进行在判断
                 if isinstance(result, Request):
 
