@@ -28,4 +28,6 @@ class Spider(object):
 
     def parse(self, response):
         # 解析请求, 并返回新的请求对或者数据对象
-        return Item(response.body)
+        # return Item(response.body)
+        # 对响应的内容进行简单测试, 需求: 将标题打印出来
+        yield Item(response.xpath("//title/text()")[0])
