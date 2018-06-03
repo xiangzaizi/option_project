@@ -14,13 +14,17 @@ class Spider(object):
     start_urls = []  # 多个url请求
 
     def start_request(self):
-        # 处理多个url
-        request_list = []
-        for start_url in self.start_urls:
-            # 构建初始请求对象冰并返回
-            request_list.append(Request(start_url))
+        """处理多个url"""
+        # request_list = []
+        # for start_url in self.start_urls:
+        #     # 构建初始请求对象冰并返回
+        #     request_list.append(Request(start_url))
+        #
+        # return request_list
 
-        return request_list
+        for start_url in self.start_urls:
+            yield Request(start_url)
+
 
     def parse(self, response):
         # 解析请求, 并返回新的请求对或者数据对象

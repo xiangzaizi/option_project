@@ -53,11 +53,14 @@ class Engine(object):
         logger.info("total time{}".format((stop-start).total_seconds()))
 
     def _start_engine(self):
-        # 1. 构建爬虫发送请求
-        start_request = self.spider.start_request()
+        # 1.获取spider中的url请求list
+        start_request_list = self.spider.start_request()
 
-        # 2. 请求入调度器
-        self.scheduler.add_request(start_request)
+        for start_request in start_request_list:  # 处理spider发送的多个请求
+            ### 1.1请求经过爬虫中间件
+            start_request = self.spider_middlewares.process_request(start_request)
+            # 2. 请求入调度器
+            self.scheduler.add_request(start_request)
 
         while True:
             # 3. 获取调度器中的请求对象
