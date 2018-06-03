@@ -18,6 +18,10 @@ from scrapy_option.item import Item
 from scrapy_option.middlewares.spider_middlewares import SpiderMiddlewares
 from scrapy_option.middlewares.downloader_middlewares import DownloaderMiddlewares
 
+# 4. 在引擎中导入日志文件
+from scrapy_option.utils.log import logger
+from datetime import datetime
+
 
 class Engine(object):
     def __init__(self):
@@ -32,8 +36,19 @@ class Engine(object):
         self.downloader_middlewares = DownloaderMiddlewares()
 
     def start(self):
+        # 添加日信息, 记录程序的运行时间
+        start = datetime.now()
+        logger.info("start time{}".format(start))
+
         # 启动engine
         self._start_engine()
+
+        stop = datetime.now()
+        logger.info("stop time{}".format(stop))
+
+        # 记录程序运行时间
+        # total_seconds()  计算两个时间之间的总差
+        logger.info("total time{}".format((stop-start).total_seconds()))
 
     def _start_engine(self):
         # 1. 构建爬虫发送请求
