@@ -10,12 +10,18 @@ class Spider(object):
     2. 解析响应对象, 生成数据对象
     """
 
-    start_url = "http://www.baidu.com"  # 框架初始测试url
+    # start_url = "http://www.baidu.com"  # 框架初始测试url
+    start_urls = []  # 多个url请求
 
     def start_request(self):
-        # 构建初始请求对象并返回
-        return Request(self.start_url)
+        # 处理多个url
+        request_list = []
+        for start_url in self.start_urls:
+            # 构建初始请求对象冰并返回
+            request_list.append(Request(start_url))
 
-    def parse_request(self, response):
+        return request_list
+
+    def parse(self, response):
         # 解析请求, 并返回新的请求对或者数据对象
         return Item(response.body)
