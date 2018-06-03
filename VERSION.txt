@@ -1,0 +1,5 @@
+0.1
+# python setup.py install 安装的框架
+# 备注: 配置框架安装到python中作为第三方模块需要的文件: requirements.txt set_up.py VERSION.tx
+# requirement.txt 写明依赖环境所支持的模块以及版本
+# VERSION.txt 标明当前模块的版本号
