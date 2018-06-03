@@ -80,27 +80,29 @@ class Engine(object):
             response = self.downloader_middlewares.process_response(response)
 
             # 5. 得到响应对象交给spider解析数据
-            result = self.spider.parse_request(response)
+            results = self.spider.parse(response)
+            # result = self.spider.parse_request(response)
+            for result in results:
 
-            # 6. 判断解析出来的结果进行在判断
-            if isinstance(result, Request):
+                # 6. 判断解析出来的结果进行在判断
+                if isinstance(result, Request):
 
-                ### 6.1 如果是请求对象, 交给爬虫中间件预处理, 添加请求入队列
-                result = self.spider_middlewares.process_request(result)
+                    ### 6.1 如果是请求对象, 交给爬虫中间件预处理, 添加请求入队列
+                    result = self.spider_middlewares.process_request(result)
 
-                # 是请求继续入队列请求数据
-                self.scheduler.add_request(result)
+                    # 是请求继续入队列请求数据
+                    self.scheduler.add_request(result)
 
-            elif isinstance(result, Item):
+                elif isinstance(result, Item):
 
-                ### 6.2 如果是Item数据, 爬虫中间件预处理,在交给管道
-                result = self.spider_middlewares.process_item(result)
+                    ### 6.2 如果是Item数据, 爬虫中间件预处理,在交给管道
+                    result = self.spider_middlewares.process_item(result)
 
-                # 得到请求的数据转到管道, 进行存储
-                self.pipeline.process_item(result)
+                    # 得到请求的数据转到管道, 进行存储
+                    self.pipeline.process_item(result)
 
-            else:
-                raise Exception("Error: parse返回的数据不能被处理")
+                else:
+                    raise Exception("Error: parse返回的数据不能被处理")
 
 
 
