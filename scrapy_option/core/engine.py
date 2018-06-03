@@ -24,9 +24,11 @@ from datetime import datetime
 
 
 class Engine(object):
-    def __init__(self):
+    def __init__(self, spider):
         # 创建初始化对象
-        self.spider = Spider()
+        # 接收实际项目spider,
+        self.spider = spider
+
         self.scheduler = Scheduler()
         self.downloader = Downloader()
         self.pipeline = Pipeline()
