@@ -4,6 +4,8 @@ from spider import BaiduSpider, DoubanSpider
 from spiders.douban import DoubanSpider
 from spiders.baidu import BaiduSpider
 from pipelines import BaiduPipeline, DoubanPipeline
+from spider_middlewares import SpiderMiddlewares1, SpiderMiddlewares2
+from download_middlewares import DownloaderMiddlewares1, DownloaderMiddlewares2
 
 if __name__ == '__main__':
     # 1.并创建对象
@@ -25,6 +27,18 @@ if __name__ == '__main__':
     # 4. 处理多个爬虫  + 添加管道
     spiders = {baidu_spider.name: baidu_spider, douban_spider.name: douban_spider}
     pipelines = [BaiduPipeline, DoubanPipeline]
+
+    # 项目完善之添加爬虫 下载中间件测试
+    spider_mids = [
+        SpiderMiddlewares1,
+        SpiderMiddlewares2
+    ]
+
+    downloader_mids = [
+        DownloaderMiddlewares1,
+        DownloaderMiddlewares2
+    ]
+
     engine = Engine(spiders, pipelines)
     engine.start()
 
