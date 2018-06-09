@@ -8,15 +8,10 @@ from scrapy_option.http.request import Request
 from scrapy_option.http.response import Response
 
 # 2. 导入核心组件
-from .spider import Spider
 from .scheduler import Scheduler
 from .downloader import Downloader
-from .pipeline import Pipeline
 from scrapy_option.item import Item
 
-# 3. 导入中间件middlwares
-from scrapy_option.middlewares.spider_middlewares import SpiderMiddlewares
-from scrapy_option.middlewares.downloader_middlewares import DownloaderMiddlewares
 
 # 4. 在引擎中导入日志文件
 from scrapy_option.utils.log import logger
@@ -24,6 +19,10 @@ from datetime import datetime
 
 # 5. 导入default_setting文件
 from scrapy_option.conf.default_settings import *
+
+# 6. 导入线程, 创建线程池, 用法和进程相同
+from multiprocessing.dummy import Pool
+
 
 
 class Engine(object):
@@ -46,6 +45,9 @@ class Engine(object):
         # 框架完善处理项目重写的爬虫 下载中间件
         self.spider_mids = self._auto_import_module_cls(SPIDER_MIDDLEWARES)
         self.downloader_mids = self._auto_import_module_cls(DOWNLOADER_MIDDLEWARES)
+
+        # 创建线程池对象
+        self.pool = Pool()  # 请求在那里就在那里使用, 写两个方法 异步处理
 
     def _auto_import_module_cls(self, paths=[], isspider=False):
         import importlib
@@ -88,7 +90,8 @@ class Engine(object):
         # total_seconds()  计算两个时间之间的总差
         logger.info("total time{}".format((stop-start).total_seconds()))
 
-    def _start_engine(self):
+    """处理多爬虫, 对_start_engine方法进行重构"""
+    def _start_requests(self):
         for spider_name, spider in self.spiders.items():
             # 1.获取spider中的url请求list
             start_request_list = spider.start_requests()
@@ -101,6 +104,9 @@ class Engine(object):
                     start_request = spider_middleware.process_request(start_request)
                 # 2. 请求入调度器
                 self.scheduler.add_request(start_request)
+
+    def _excute_request_response_item(self):
+        # 执行请求   响应   items数据
 
         while True:
             # 3. 获取调度器中的请求对象
