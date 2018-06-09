@@ -104,6 +104,8 @@ class Engine(object):
                 # 当请求数==响应数时断开
                 break
 
+        logger.info(u"主线程执行结束")
+
     """处理多爬虫, 对_start_engine方法进行重构"""
     def _start_requests(self):
         for spider_name, spider in self.spiders.items():

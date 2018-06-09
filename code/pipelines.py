@@ -6,7 +6,7 @@ from spiders.douban import DoubanSpider
 class BaiduPipeline(object):
     def process_item(self, item, spider):
         if isinstance(spider, BaiduSpider):
-            print("BaiduSpider item:{}".format(item.data))
+            print(u"BaiduSpider item:{}".format(item.data))
 
         return item
 
