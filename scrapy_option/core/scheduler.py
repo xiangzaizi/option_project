@@ -32,6 +32,15 @@ class Scheduler(object):
         self.total_request = 0  # 添加计数器, 与response相对应
 
     def add_request(self, request):
+        # 进来先判断request.filter(True(去重) / False(不去重))
+        """增量爬虫"""
+        if not request.filter:  # False不做去重so(不用添加指纹, 不用对指纹去重)
+            logger.info(u"添加请求（dont filter) 成功: [{}] <{}>".format(request.method, request.url))
+            self.queue.put(request)
+
+            # 只要put了请求了这里就自增1
+            self.total_request += 1
+
         # ***2.生成指纹(唯一性)
         fp = self._gen_fingerprint(request)
 
