@@ -33,3 +33,9 @@ ASNYC_MAX_COUNT = 5
 # 提供可选择的多任务
 ASYNC_TYPE = 'thread'
 # ASYNC_TYPE = 'coroutine'
+
+# 配置redis服务器, 在queue中直接导入default_settings
+REDIS_QUEUE_NAME = 'request_queue'
+REDIS_QUEUE_HOST = 'localhost'
+REDIS_QUEUE_PORT = 6379
+REDIS_QUEUE_DB = 7
