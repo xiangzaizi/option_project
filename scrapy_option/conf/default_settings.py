@@ -12,7 +12,7 @@ DEFAULT_LOG_FILENAME = 'log.log'    # 默认日志文件名称
 
 
 # 使用项目中的配置文件, 修改默认配置文件内容
-from settings import *
+from code.settings import *
 """
 1. 此处位置不用管settings爆红, 在项目导入框架时sys.path会沿着项目settings找有就会以项目配置文件配置内容运行
 2. 没有就会按照框架内部配置的文件调试

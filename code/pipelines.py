@@ -14,6 +14,9 @@ class BaiduPipeline(object):
 class DoubanPipeline(object):
     def process_item(self, item, spider):
         if isinstance(spider, DoubanSpider):
-            print("DoubanSpider item:{}".format(item.data))
+            print(u"DoubanSpider item:{}".format(item.data))
+
+            # UnicodeEncodeError-->此处位置不添加u会报的错误
+            # 'ascii' codec can't encode characters in position 0-5: ordinal not in range(128)
 
         return item
