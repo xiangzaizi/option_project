@@ -21,9 +21,22 @@ from datetime import datetime
 # 5. 导入default_setting文件
 from scrapy_option.conf.default_settings import *
 
-# 6. 导入线程, 创建线程池, 用法和进程相同
-from multiprocessing.dummy import Pool
+# # 6. 导入线程, 创建线程池, 用法和进程相同
+# from multiprocessing.dummy import Pool
+#
+# # 7. 导入协程的Pool, 导入重写后的协程就可以直接使用原有的线程池不需要在修改代码
+# from scrapy_option.async.coroutine import Pool
 
+# 8. 提供可选的多任务优化 线程 or 协成
+if ASYNC_TYPE == "coroutine":
+    from scrapy_plus.async.coroutine import Pool
+    logger.info(u"正在启用协程异步模式")
+elif ASYNC_TYPE == "thread":
+    from multiprocessing.dummy import Pool
+    logger.info(u"正在启用多线程异步模式")
+
+else:
+    raise Exception(u"不支持该异步类型")
 
 
 class Engine(object):

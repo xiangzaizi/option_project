@@ -29,3 +29,7 @@ DOWNLOADER_MIDDLEWARES = [
 
 # 设置并发量
 ASNYC_MAX_COUNT = 5
+
+# 提供可选择的多任务
+ASYNC_TYPE = 'thread'
+# ASYNC_TYPE = 'coroutine'
