@@ -18,6 +18,7 @@ class Scheduler(object):
     def __init__(self):
         self.queue = Queue()
         self._filter_set = set()  # 保存指纹, 目前是测试的url, 使用set()对请求的url进行去重
+        self.total_request = 0  # 添加计数器, 与response相对应
 
     def add_request(self, request):
         # ***2.生成指纹(唯一性)
@@ -27,6 +28,10 @@ class Scheduler(object):
         if not self._filter_request(fp, request):
             logger.info(u"添加请求(not filter)成功:[{}]<{}>".format(request.method, request.url))
             self.queue.put(request)
+
+            # put请求这里就自增1
+            self.total_request += 1
+
             # add请求到队列中
             # self._filter_set.add(request.url)
             self._filter_set.add(fp)  # 通过指纹来去重

@@ -49,6 +49,9 @@ class Engine(object):
         # 创建线程池对象
         self.pool = Pool()  # 请求在那里就在那里使用, 写两个方法 异步处理
 
+        # 添加计数器
+        self.total_response = 0  # 添加响应的计数器
+
     def _auto_import_module_cls(self, paths=[], isspider=False):
         import importlib
         if isspider:
@@ -90,6 +93,17 @@ class Engine(object):
         # total_seconds()  计算两个时间之间的总差
         logger.info("total time{}".format((stop-start).total_seconds()))
 
+    def _start_engine(self):
+        # 处理请求
+        self._start_requests()  # --->发送请求
+        # 处理调度器的请求
+        while True:
+            self._excute_request_response_item()  # ---->执行请求
+
+            if self.total_response == self.scheduler.total_request:
+                # 当请求数==响应数时断开
+                break
+
     """处理多爬虫, 对_start_engine方法进行重构"""
     def _start_requests(self):
         for spider_name, spider in self.spiders.items():
@@ -108,63 +122,71 @@ class Engine(object):
     def _excute_request_response_item(self):
         # 执行请求   响应   items数据
 
-        while True:
-            # 3. 获取调度器中的请求对象
-            request = self.scheduler.get_request()
-
-            # 当队列中的请求为空的时候, 退出程序
-            if request is None:
-                break
-
-            ### 3.1 将请求经过下载中间件预处理--->请求
-            for downloader_middleware in self.downloader_mids:
-                request = downloader_middleware.process_request(request)
-
-            # 4. 将请求交个下载器
-            response = self.downloader.get_response(request)
-
-            ### 4.1 将响应经过下载中间件预处理--->响应
-            for downloader_middleware in self.downloader_mids:
-                response = downloader_middleware.process_response(response)
-
-            # 5. 得到响应对象交给spider解析数据
-            # results = self.spider.parse(response)
-            # 1.request.parse--->取parse对应的解析方法
-            spider = self.spiders[request.spider_name]
-            parse_func = getattr(spider, request.parse)
+        # 3. 获取调度器中的请求对象, 这样就是scheduler中过滤之后的请求
+        request = self.scheduler.get_request()
+        # 注意: add请求, put请求
+        # 请求结束时-->所以设定scheduler中的队列get(False)-->表示添加的url请求完, 返回响应None
 
 
+        # 当队列中的请求为空的时候, 退出程序
+        if request is None:
+            # break
+            return   # 没有请求函数进来, 程序退出
 
-            # 2.使用parse_next(处理响应)
-            results = parse_func(response)
+        ### 3.1 将请求经过下载中间件预处理--->请求
+        for downloader_middleware in self.downloader_mids:
+            request = downloader_middleware.process_request(request)
 
-            for result in results:
-                # 6. 判断解析出来的结果进行在判断
-                if isinstance(result, Request):
-                    result.spider_name = request.spider_name  # 给爬虫添加一个名字
-                    ### 6.1 如果是请求对象, 交给爬虫中间件预处理, 添加请求入队列
-                    for spider_middleware in self.spider_mids:
-                        result = spider_middleware.process_request(result)
+        # 4. 将请求交个下载器
+        response = self.downloader.get_response(request)
 
-                    # 是请求继续入队列请求数据
-                    self.scheduler.add_request(result)
+        ### 4.1 将响应经过下载中间件预处理--->响应
+        for downloader_middleware in self.downloader_mids:
+            response = downloader_middleware.process_response(response)
 
-                elif isinstance(result, Item):
-
-                    ### 6.2 如果是Item数据, 爬虫中间件预处理,在交给管道
-                    for spider_middleware in self.spider_mids:
-                        result = spider_middleware.process_item(result)
-
-                    # 得到请求的数据转到管道, 进行存储
-                    # 框架完善--->多管道处理能力
-                    for pipeline in self.pipelines:
-                        result = pipeline.process_item(result, spider)
-
-                        # result -->接受在pipelins中处理完毕return的文件
+        # 5. 得到响应对象交给spider解析数据
+        # results = self.spider.parse(response)
+        # 1.request.parse--->取parse对应的解析方法
+        spider = self.spiders[request.spider_name]
+        parse_func = getattr(spider, request.parse)
 
 
-                else:
-                    raise Exception("Error: parse返回的数据不能被处理")
+
+        # 2.使用parse_next(处理响应)
+        results = parse_func(response)
+
+        for result in results:
+            # 6. 判断解析出来的结果进行在判断
+            if isinstance(result, Request):
+                result.spider_name = request.spider_name  # 给爬虫添加一个名字
+                ### 6.1 如果是请求对象, 交给爬虫中间件预处理, 添加请求入队列
+                for spider_middleware in self.spider_mids:
+                    result = spider_middleware.process_request(result)
+
+                # 是请求继续入队列请求数据
+                self.scheduler.add_request(result)
+
+            elif isinstance(result, Item):
+
+                ### 6.2 如果是Item数据, 爬虫中间件预处理,在交给管道
+                for spider_middleware in self.spider_mids:
+                    result = spider_middleware.process_item(result)
+
+                # 得到请求的数据转到管道, 进行存储
+                # 框架完善--->多管道处理能力
+                for pipeline in self.pipelines:
+                    result = pipeline.process_item(result, spider)
+
+                    # result -->接受在pipelins中处理完毕return的文件
+
+
+            else:
+                raise Exception("Error: parse返回的数据不能被处理")
+
+        # 不管当前有几个线程, 只要有一个线程提取完响应后就+1
+        self.total_response += 1
+        # 这里的响应--->对应调度器发完请求进行同样的+1计数
+
 
 
 
