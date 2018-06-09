@@ -3,6 +3,7 @@
 1. 对外提供整个程序的入口
 2. 依次调用其他组件对外提供的接口, 实现整个框架的运作
 """
+import time
 # 1. 导入请求响应
 from scrapy_option.http.request import Request
 from scrapy_option.http.response import Response
@@ -115,6 +116,10 @@ class Engine(object):
             self.pool.apply_async(self._excute_request_response_item, callback=self._callback)
 
         while True:
+            # 优化while True等待, 当网络响应慢的时候, 一个响应需要2秒, 那CPU就处在空转中
+            # 通过测试这样优化后可以减轻cpu负担
+            time.sleep(0.001)
+
             if self.total_response == self.scheduler.total_request and self.total_response != 0:
                 # total_response != 0 因为初始值是0, 程序没有开始就结束所以去除
                 # 当请求数==响应数时断开
