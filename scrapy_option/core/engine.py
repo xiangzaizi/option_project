@@ -111,7 +111,7 @@ class Engine(object):
             # self.pool.apply_async(self._excute_request_response_item())
 
         # 如何控制并发的次数？
-        for i in range(5):
+        for i in range(ASNYC_MAX_COUNT):
             logger.info(u'子线程正在执行...')
             self.pool.apply_async(self._excute_request_response_item, callback=self._callback)
 

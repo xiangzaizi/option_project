@@ -26,3 +26,6 @@ DOWNLOADER_MIDDLEWARES = [
     # "downloader_middlewares.DownloaderMiddlewares1",
     # "downloader_middlewares.DownloaderMiddlewares2"
 ]
+
+# 设置并发量
+ASNYC_MAX_COUNT = 5
