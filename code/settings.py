@@ -46,3 +46,9 @@ ROLE = None
 # 代码分布: 主机端, 客户端, 放在不同的端, 启用不同的角色配置
 # ROLE = "master"
 # ROLE = "slave"
+
+# redis指纹集合默认配置
+REDIS_SET_NAME = 'fingerprint_set'
+REDIS_SET_HOST = 'localhost'
+REDIS_SET_PORT = 6379
+REDIS_SET_DB = 7
