@@ -93,19 +93,30 @@ class Engine(object):
         # total_seconds()  计算两个时间之间的总差
         logger.info("total time{}".format((stop-start).total_seconds()))
 
+    def _callback(self, _): # 这个的callback必须传一个参数,但是这里不用，none所以传一个下划线
+        self.pool.apply_async(self._excute_request_response_item, callback=self._callback)  # 一个递归的过程
+
     def _start_engine(self):
         # 处理请求
         # self._start_requests()  # --->发送请求
 
         """__*** 异步非阻塞写法发送请求***__"""
-        self.pool.apply_async(self._start_requests())
+        self.pool.apply_async(self._start_requests)
 
 
         # 处理调度器的请求
-        while True:
-            self.pool.apply_async(self._excute_request_response_item())  # ---->执行请求
+        # while True:
+            # ---->执行请求 但并发的数量不能控制
+            # self.pool.apply_async(self._excute_request_response_item())
 
-            if self.total_response == self.scheduler.total_request:
+        # 如何控制并发的次数？
+        for i in range(5):
+            logger.info(u'子线程正在执行...')
+            self.pool.apply_async(self._excute_request_response_item, callback=self._callback)
+
+        while True:
+            if self.total_response == self.scheduler.total_request and self.total_response != 0:
+                # total_response != 0 因为初始值是0, 程序没有开始就结束所以去除
                 # 当请求数==响应数时断开
                 break
 
