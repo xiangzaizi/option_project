@@ -24,10 +24,10 @@ from datetime import datetime
 
 
 class Engine(object):
-    def __init__(self, spider):
+    def __init__(self, spiders):
         # 创建初始化对象
         # 接收实际项目spider,
-        self.spider = spider
+        self.spiders = spiders
 
         self.scheduler = Scheduler()
         self.downloader = Downloader()
@@ -53,14 +53,17 @@ class Engine(object):
         logger.info("total time{}".format((stop-start).total_seconds()))
 
     def _start_engine(self):
-        # 1.获取spider中的url请求list
-        start_request_list = self.spider.start_request()
+        for spider_name, spider in self.spiders.items:
+            # 1.获取spider中的url请求list
+            start_request_list = spider.start_request()
 
-        for start_request in start_request_list:  # 处理spider发送的多个请求
-            ### 1.1请求经过爬虫中间件
-            start_request = self.spider_middlewares.process_request(start_request)
-            # 2. 请求入调度器
-            self.scheduler.add_request(start_request)
+            for start_request in start_request_list:  # 处理spider发送的多个请求
+                start_request.spider_name = spider.name
+
+                ### 1.1请求经过爬虫中间件
+                start_request = self.spider_middlewares.process_request(start_request)
+                # 2. 请求入调度器
+                self.scheduler.add_request(start_request)
 
         while True:
             # 3. 获取调度器中的请求对象
@@ -82,14 +85,18 @@ class Engine(object):
             # 5. 得到响应对象交给spider解析数据
             # results = self.spider.parse(response)
             # 1.request.parse--->取parse对应的解析方法
-            parse_func = getattr(self.spider, request.parse)
+            spider = self.spiders[request.spider_name]
+            parse_func = getattr(spider, request.parse)
+
+
+
             # 2.使用parse_next(处理响应)
             results = parse_func(response)
 
             for result in results:
                 # 6. 判断解析出来的结果进行在判断
                 if isinstance(result, Request):
-
+                    result.spider_name = request.spider_name  # 给爬虫添加一个名字
                     ### 6.1 如果是请求对象, 交给爬虫中间件预处理, 添加请求入队列
                     result = self.spider_middlewares.process_request(result)
 

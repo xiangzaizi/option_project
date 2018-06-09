@@ -5,7 +5,7 @@ from scrapy_option.item import Item
 
 
 class DoubanSpider(Spider):
-
+    name = "douban"
     # start_urls = ["https://movie.douban.com/top250?start=" + str(page) for page in range(0, 226, 25)]
 
     headers = {"User-Agent" : "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko"}
