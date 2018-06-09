@@ -116,37 +116,38 @@ class Engine(object):
             self.pool.apply_async(self._excute_request_response_item, callback=self._callback)  # 一个递归的过程
 
     def _start_engine(self):
-        # 处理请求
-        # self._start_requests()  # --->发送请求
+        if ROLE == "master" or ROLE is None:  # 主执行start_request, 当然不是分布式时也需要执行start_request
+            # 处理请求
+            # self._start_requests()  # --->发送请求
 
-        """__*** 异步非阻塞写法发送请求***__"""
-        self.pool.apply_async(self._start_requests)
+            """__*** 异步非阻塞写法发送请求***__"""
+            self.pool.apply_async(self._start_requests)
 
 
         # 处理调度器的请求
         # while True:
             # ---->执行请求 但并发的数量不能控制
             # self.pool.apply_async(self._excute_request_response_item())
+        if ROLE == 'slave' or ROLE is None:  # slave端执行请求, 主从分离
+            # 如何控制并发的次数？
+            for i in range(ASNYC_MAX_COUNT):
+                logger.info(u'子线程正在执行...')
+                self.pool.apply_async(self._excute_request_response_item, callback=self._callback)
 
-        # 如何控制并发的次数？
-        for i in range(ASNYC_MAX_COUNT):
-            logger.info(u'子线程正在执行...')
-            self.pool.apply_async(self._excute_request_response_item, callback=self._callback)
+            while True:
+                # 优化while True等待, 当网络响应慢的时候, 一个响应需要2秒, 那CPU就处在空转中
+                # 通过测试这样优化后可以减轻cpu负担
+                time.sleep(0.001)
 
-        while True:
-            # 优化while True等待, 当网络响应慢的时候, 一个响应需要2秒, 那CPU就处在空转中
-            # 通过测试这样优化后可以减轻cpu负担
-            time.sleep(0.001)
+                if self.total_response == self.scheduler.total_request and self.total_response != 0:
+                    self.is_running = False
+                    # total_response != 0 因为初始值是0, 程序没有开始就结束所以去除
+                    # 当请求数==响应数时断开
+                    break
+            self.pool.close()  # 不在向线程池中添加任务了
+            self.pool.join()  # 让主线程等待所有子线程执行结束
 
-            if self.total_response == self.scheduler.total_request and self.total_response != 0:
-                self.is_running = False
-                # total_response != 0 因为初始值是0, 程序没有开始就结束所以去除
-                # 当请求数==响应数时断开
-                break
-        self.pool.close()  # 不在向线程池中添加任务了
-        self.pool.join()  # 让主线程等待所有子线程执行结束
-
-        logger.info(u"主线程执行结束")
+            logger.info(u"主线程执行结束")
 
     """处理多爬虫, 对_start_engine方法进行重构"""
     def _start_requests(self):
