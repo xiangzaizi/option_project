@@ -19,10 +19,10 @@ class DoubanSpider(Spider):
     def parse(self, response):
         for node in response.xpath("//div[@class='hd']"):
             title = node.xpath(".//span[@class='title'][1]/text()")[0]
-            # yield Item(title)  # 返回电影的标题
+            yield Item(title)  # 返回电影的标题
 
-            link = node.xpath("./a/@href")[0]  # 获取每部电影的下一层的url连接
-            yield Request(link, headers=self.headers, parse='parse_next')  # 下一层页面的数据交给parse_next处理
-
-    def parse_next(self, response):
-        yield Item(response.xpath("//title/text()")[0].strip())
+    #         link = node.xpath("./a/@href")[0]  # 获取每部电影的下一层的url连接
+    #         yield Request(link, headers=self.headers, parse='parse_next')  # 下一层页面的数据交给parse_next处理
+    #
+    # def parse_next(self, response):
+    #     yield Item(response.xpath("//title/text()")[0].strip())

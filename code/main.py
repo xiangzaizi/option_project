@@ -39,7 +39,11 @@ if __name__ == '__main__':
         DownloaderMiddlewares2
     ]
 
-    engine = Engine(spiders, pipelines)
+    engine = Engine(spiders,
+                    pipelines,
+                    # 添加中间件到engine中完善框架
+                    spider_mids,
+                    downloader_mids)
     engine.start()
 
 

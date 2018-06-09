@@ -24,7 +24,7 @@ from datetime import datetime
 
 
 class Engine(object):
-    def __init__(self, spiders, pipelines):
+    def __init__(self, spiders, pipelines, spider_mids, downloader_mids):
         # 创建初始化对象
         # 接收实际项目spider,
         self.spiders = spiders
@@ -37,8 +37,12 @@ class Engine(object):
 
 
         # 初始化中间件文件
-        self.spider_middlewares = SpiderMiddlewares()
-        self.downloader_middlewares = DownloaderMiddlewares()
+        # self.spider_middlewares = SpiderMiddlewares()
+        # self.downloader_middlewares = DownloaderMiddlewares()
+
+        # 框架完善处理项目重写的爬虫 下载中间件
+        self.spider_mids = spider_mids
+        self.downloader_mids = downloader_mids
 
     def start(self):
         # 添加日信息, 记录程序的运行时间
@@ -64,7 +68,8 @@ class Engine(object):
                 start_request.spider_name = spider.name
 
                 ### 1.1请求经过爬虫中间件
-                start_request = self.spider_middlewares.process_request(start_request)
+                for spider_middlewares in self.spider_mids:
+                    start_request = spider_middlewares.process_request(start_request)
                 # 2. 请求入调度器
                 self.scheduler.add_request(start_request)
 
@@ -77,13 +82,15 @@ class Engine(object):
                 break
 
             ### 3.1 将请求经过下载中间件预处理--->请求
-            request = self.downloader_middlewares.process_request(request)
+            for downloader_middlewares in self.downloader_mids:
+                request = downloader_middlewares.process_request(request)
 
             # 4. 将请求交个下载器
             response = self.downloader.get_response(request)
 
             ### 4.1 将响应经过下载中间件预处理--->响应
-            response = self.downloader_middlewares.process_response(response)
+            for downloader_middlewares in self.downloader_mids:
+                response = downloader_middlewares.process_response(response)
 
             # 5. 得到响应对象交给spider解析数据
             # results = self.spider.parse(response)
@@ -101,7 +108,8 @@ class Engine(object):
                 if isinstance(result, Request):
                     result.spider_name = request.spider_name  # 给爬虫添加一个名字
                     ### 6.1 如果是请求对象, 交给爬虫中间件预处理, 添加请求入队列
-                    result = self.spider_middlewares.process_request(result)
+                    for spider_middlewares in self.spider_mids:
+                        result = spider_middlewares.process_request(result)
 
                     # 是请求继续入队列请求数据
                     self.scheduler.add_request(result)
@@ -109,7 +117,8 @@ class Engine(object):
                 elif isinstance(result, Item):
 
                     ### 6.2 如果是Item数据, 爬虫中间件预处理,在交给管道
-                    result = self.spider_middlewares.process_item(result)
+                    for spider_middlewares in self.spider_mids:
+                        result = spider_middlewares.process_item(result)
 
                     # 得到请求的数据转到管道, 进行存储
                     # 框架完善--->多管道处理能力
