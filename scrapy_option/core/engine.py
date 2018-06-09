@@ -53,6 +53,10 @@ class Engine(object):
         # 添加计数器
         self.total_response = 0  # 添加响应的计数器
 
+        # 设置主线程的运行状态, 主线程是否在执行?
+        self.is_running = True
+
+
     def _auto_import_module_cls(self, paths=[], isspider=False):
         import importlib
         if isspider:
@@ -95,7 +99,8 @@ class Engine(object):
         logger.info("total time{}".format((stop-start).total_seconds()))
 
     def _callback(self, _): # 这个的callback必须传一个参数,但是这里不用，none所以传一个下划线
-        self.pool.apply_async(self._excute_request_response_item, callback=self._callback)  # 一个递归的过程
+        if self.is_running == True:
+            self.pool.apply_async(self._excute_request_response_item, callback=self._callback)  # 一个递归的过程
 
     def _start_engine(self):
         # 处理请求
@@ -121,9 +126,12 @@ class Engine(object):
             time.sleep(0.001)
 
             if self.total_response == self.scheduler.total_request and self.total_response != 0:
+                self.is_running = False
                 # total_response != 0 因为初始值是0, 程序没有开始就结束所以去除
                 # 当请求数==响应数时断开
                 break
+        self.pool.close()  # 不在向线程池中添加任务了
+        self.pool.join()  # 让主线程等待所有子线程执行结束
 
         logger.info(u"主线程执行结束")
 
