@@ -39,3 +39,10 @@ REDIS_QUEUE_NAME = 'request_queue'
 REDIS_QUEUE_HOST = 'localhost'
 REDIS_QUEUE_PORT = 6379
 REDIS_QUEUE_DB = 7
+
+# 分布式
+ROLE = None
+# 使用了任何一个，都表示分布式模式
+# 代码分布: 主机端, 客户端, 放在不同的端, 启用不同的角色配置
+# ROLE = "master"
+# ROLE = "slave"

@@ -2,16 +2,24 @@
 """创建可兼容py2_py3的队列"""
 import six
 from scrapy_option.utils.log import logger
+from scrapy_option.conf.default_settings import *
 # 方式一
-try:
-    from Queue import Queue # py2
-except ImportError:
-    from queue import Queue # py3
+# try:
+#     from Queue import Queue # py2
+# except ImportError:
+#     from queue import Queue # py3
 
 # 方式二
 # 利six模块实现py2和py3的兼容
 # 被移动的属性和模块six被加载得太迟了, 所以Pycharm无法引用解析
 # from six.moves.queue import Queue
+
+if ROLE is None:  # 非分布式, 使用python自己的队列
+    from six.moves.queue import Queue
+elif ROLE in ["master", "slave"]:
+    from scrapy_option.queue import Queue  # 导入配合redis写的queue.py
+else:
+    raise Exception(u"不支持该模式{}".format(ROLE))
 
 
 class Scheduler(object):
