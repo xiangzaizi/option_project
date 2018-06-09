@@ -24,14 +24,17 @@ from datetime import datetime
 
 
 class Engine(object):
-    def __init__(self, spiders):
+    def __init__(self, spiders, pipelines):
         # 创建初始化对象
         # 接收实际项目spider,
         self.spiders = spiders
 
         self.scheduler = Scheduler()
         self.downloader = Downloader()
-        self.pipeline = Pipeline()
+        # self.pipeline = Pipeline()
+        # 完善框架处理多管道能力
+        self.pipelines = pipelines
+
 
         # 初始化中间件文件
         self.spider_middlewares = SpiderMiddlewares()
@@ -109,7 +112,12 @@ class Engine(object):
                     result = self.spider_middlewares.process_item(result)
 
                     # 得到请求的数据转到管道, 进行存储
-                    self.pipeline.process_item(result)
+                    # 框架完善--->多管道处理能力
+                    for pipeline in self.pipelines:
+                        result = pipeline.process_item(result)
+
+                        # result -->接受在pipelins中处理完毕return的文件
+
 
                 else:
                     raise Exception("Error: parse返回的数据不能被处理")

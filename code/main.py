@@ -3,6 +3,7 @@ from scrapy_option.core.engine import Engine
 from spider import BaiduSpider, DoubanSpider
 from spiders.douban import DoubanSpider
 from spiders.baidu import BaiduSpider
+from pipelines import BaiduPipeline, DoubanPipeline
 
 if __name__ == '__main__':
     # 1.并创建对象
@@ -21,9 +22,10 @@ if __name__ == '__main__':
     douban_spider = DoubanSpider()
     baidu_spider = BaiduSpider()
 
-    # 4. 处理多个爬虫
+    # 4. 处理多个爬虫  + 添加管道
     spiders = {baidu_spider.name: baidu_spider, douban_spider.name: douban_spider}
-    engine = Engine(spiders)
+    pipelines = [BaiduPipeline, DoubanPipeline]
+    engine = Engine(spiders, pipelines)
     engine.start()
 
 
