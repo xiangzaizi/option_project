@@ -18,11 +18,11 @@ PIPELINES = [
 
 # 3. 项目添加自定义爬虫  下载中间件
 SPIDER_MIDDLEWARES = [
-    "spider_middlewares.SpiderMiddlewares1",
-    "spider_middlewares.SpiderMiddlewares2",
+    # "spider_middlewares.SpiderMiddlewares1",
+    # "spider_middlewares.SpiderMiddlewares2",
 ]
 
 DOWNLOADER_MIDDLEWARES = [
-    "downloader_middlewares.DownloaderMiddlewares1",
-    "downloader_middlewares.DownloaderMiddlewares2"
+    # "downloader_middlewares.DownloaderMiddlewares1",
+    # "downloader_middlewares.DownloaderMiddlewares2"
 ]
