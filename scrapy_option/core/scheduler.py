@@ -16,8 +16,10 @@ from scrapy_option.conf.default_settings import *
 
 if ROLE is None:  # 非分布式, 使用python自己的队列
     from six.moves.queue import Queue
+    from scrapy_option.set import NormalFilterSet  # 非分布式
 elif ROLE in ["master", "slave"]:
     from scrapy_option.queue import Queue  # 导入配合redis写的queue.py
+    from scrapy_option.set import RedisFilterSet as Set  # redis
 else:
     raise Exception(u"不支持该模式{}".format(ROLE))
 
@@ -25,7 +27,8 @@ else:
 class Scheduler(object):
     def __init__(self):
         self.queue = Queue()
-        self._filter_set = set()  # 保存指纹, 目前是测试的url, 使用set()对请求的url进行去重
+        # self._filter_set = set()  # 保存指纹, 目前是测试的url, 使用set()对请求的url进行去重
+        self._filter_set = Set()    # 这些指纹就保存到redis中了可实现断点续传？
         self.total_request = 0  # 添加计数器, 与response相对应
 
     def add_request(self, request):
