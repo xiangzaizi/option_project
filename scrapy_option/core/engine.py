@@ -95,10 +95,15 @@ class Engine(object):
 
     def _start_engine(self):
         # 处理请求
-        self._start_requests()  # --->发送请求
+        # self._start_requests()  # --->发送请求
+
+        """__*** 异步非阻塞写法发送请求***__"""
+        self.pool.apply_async(self._start_requests())
+
+
         # 处理调度器的请求
         while True:
-            self._excute_request_response_item()  # ---->执行请求
+            self.pool.apply_async(self._excute_request_response_item())  # ---->执行请求
 
             if self.total_response == self.scheduler.total_request:
                 # 当请求数==响应数时断开
