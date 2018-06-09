@@ -134,20 +134,20 @@ class Engine(object):
                 logger.info(u'子线程正在执行...')
                 self.pool.apply_async(self._excute_request_response_item, callback=self._callback)
 
-            while True:
-                # 优化while True等待, 当网络响应慢的时候, 一个响应需要2秒, 那CPU就处在空转中
-                # 通过测试这样优化后可以减轻cpu负担
-                time.sleep(0.001)
+        while True:
+            # 优化while True等待, 当网络响应慢的时候, 一个响应需要2秒, 那CPU就处在空转中
+            # 通过测试这样优化后可以减轻cpu负担
+            time.sleep(0.001)
 
-                if self.total_response == self.scheduler.total_request and self.total_response != 0:
-                    self.is_running = False
-                    # total_response != 0 因为初始值是0, 程序没有开始就结束所以去除
-                    # 当请求数==响应数时断开
-                    break
-            self.pool.close()  # 不在向线程池中添加任务了
-            self.pool.join()  # 让主线程等待所有子线程执行结束
+            if self.total_response == self.scheduler.total_request and self.total_response != 0:
+                self.is_running = False
+                # total_response != 0 因为初始值是0, 程序没有开始就结束所以去除
+                # 当请求数==响应数时断开
+                break
+        self.pool.close()  # 不在向线程池中添加任务了
+        self.pool.join()  # 让主线程等待所有子线程执行结束
 
-            logger.info(u"主线程执行结束")
+        logger.info(u"主线程执行结束")
 
     """处理多爬虫, 对_start_engine方法进行重构"""
     def _start_requests(self):
