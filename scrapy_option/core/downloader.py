@@ -3,6 +3,7 @@
 
 from scrapy_option.http.response import Response
 import requests
+from scrapy_option.utils.log import logger
 
 
 class Downloader(object):
@@ -24,6 +25,9 @@ class Downloader(object):
             )
         else:
             raise Exception("Error: 不支持该请求的方法")
+
+        # 获取到响应
+        logger.info(u"[{}] <{}>".format(res.status_code, res.url))
 
         # 2. 构建响应的对象, 并返回
         return Response(
