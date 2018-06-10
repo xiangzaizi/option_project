@@ -16,7 +16,7 @@ from scrapy_option.conf.default_settings import *
 
 if ROLE is None:  # 非分布式, 使用python自己的队列
     from six.moves.queue import Queue
-    from scrapy_option.set import NormalFilterSet  # 非分布式
+    from scrapy_option.set import NormalFilterSet as Set # 非分布式
 elif ROLE in ["master", "slave"]:
     from scrapy_option.queue import Queue  # 导入配合redis写的queue.py
     from scrapy_option.set import RedisFilterSet as Set  # redis
