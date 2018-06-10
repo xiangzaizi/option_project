@@ -40,7 +40,7 @@ class Scheduler(object):
 
             # 只要put了请求了这里就自增1
             self.total_request += 1
-            # return  # 到这里就结束不添加指纹, 不添加指纹
+            return  # 到这里就结束不添加指纹, 不添加指纹
 
         # ***2.生成指纹(唯一性)
         fp = self._gen_fingerprint(request)
@@ -55,7 +55,7 @@ class Scheduler(object):
 
             # add请求到队列中
             # self._filter_set.add(request.url)
-            self._filter_set.add(fp)  # 通过指纹来去重
+            self._filter_set.add_fp(fp)  # 通过指纹来去重
 
     def get_request(self):
         # 获取排队中的请求--->进入下载器下载

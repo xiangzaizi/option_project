@@ -12,4 +12,4 @@ class BaiduSpider(Spider):
 
     def start_requests(self):
         for start_url in self.start_urls:
-            yield Request(start_url)
+            yield Request(start_url, filter=False)

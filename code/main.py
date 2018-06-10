@@ -1,4 +1,6 @@
 # -*- coding:utf-8 -*-
+import time
+
 from scrapy_option.core.engine import Engine
 
 if __name__ == '__main__':
@@ -41,6 +43,9 @@ if __name__ == '__main__':
     """以上注释内容全部添加到settings中, 通过settings控制组件的启用"""
 
     engine = Engine()
-    engine.start()
+    while True:
+        engine.start()
+        time.sleep(5)
+
 
 

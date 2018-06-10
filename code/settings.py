@@ -6,14 +6,14 @@ DEFAULT_LOG_FILENAME = 'baidu.log'
 
 # 1. 多个爬虫
 SPIDERS = [
-    # "spiders.baidu.BaiduSpider",
-    "spiders.douban.DoubanSpider",
+    "spiders.baidu.BaiduSpider",
+    # "spiders.douban.DoubanSpider",
 ]
 
 # 2. 自定义的管道
 PIPELINES = [
     "pipelines.BaiduPipeline",
-    "pipelines.DoubanPipeline",
+    # "pipelines.DoubanPipeline",
 ]
 
 # 3. 项目添加自定义爬虫  下载中间件

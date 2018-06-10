@@ -99,17 +99,17 @@ class Engine(object):
     def start(self):
         # 添加日信息, 记录程序的运行时间
         start = datetime.now()
-        logger.info("start time{}".format(start))
+        logger.info("start time{}:".format(start))
 
         # 启动engine
         self._start_engine()
 
         stop = datetime.now()
-        logger.info("stop time{}".format(stop))
+        logger.info("stop time{}:".format(stop))
 
         # 记录程序运行时间
         # total_seconds()  计算两个时间之间的总差
-        logger.info("total time{}".format((stop-start).total_seconds()))
+        logger.info("total time{}:".format((stop-start).total_seconds()))
 
     def _callback(self, _): # 这个的callback必须传一个参数,但是这里不用，none所以传一个下划线
         if self.is_running == True:
@@ -120,7 +120,7 @@ class Engine(object):
             # 处理请求
             # self._start_requests()  # --->发送请求
 
-            """__*** 异步非阻塞写法发送请求***__"""
+            """__*** 1.异步非阻塞--->发送请求***__"""
             self.pool.apply_async(self._start_requests)
 
 
@@ -132,6 +132,7 @@ class Engine(object):
             # 如何控制并发的次数？
             for i in range(ASNYC_MAX_COUNT):
                 logger.info(u'子线程正在执行...')
+                """__*** 2.异步非阻塞--->执行请求***__"""
                 self.pool.apply_async(self._excute_request_response_item, callback=self._callback)
 
         while True:
