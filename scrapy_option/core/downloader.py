@@ -10,15 +10,18 @@ class Downloader(object):
 
     def get_response(self, request):
         # 1. 根据请求的对象, 发起请求
+
         if request.method.upper() == "GET":
             res = requests.get(
                 request.url,
+                # request.meta,
                 headers=request.headers,
                 params=request.params
             )
         elif request.method.upper() == "POST":
             res = request.post(
                 request.url,
+                # request.meta,
                 headers=request.headers,
                 params=request.params,
                 data=request.data  # 对应post请求提交进来时的数据
@@ -34,7 +37,8 @@ class Downloader(object):
             res.url,
             res.status_code,
             res.headers,
-            res.content
+            res.content,
+            # res.meta
         )
 
 

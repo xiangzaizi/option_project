@@ -8,7 +8,10 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+<<<<<<< HEAD
 env/
+=======
+>>>>>>> 43b2b27a598828d9ff52a0f59c888956d6b1b6a7
 build/
 develop-eggs/
 dist/
@@ -24,6 +27,10 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+<<<<<<< HEAD
+=======
+MANIFEST
+>>>>>>> 43b2b27a598828d9ff52a0f59c888956d6b1b6a7
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -45,6 +52,10 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+<<<<<<< HEAD
+=======
+.pytest_cache/
+>>>>>>> 43b2b27a598828d9ff52a0f59c888956d6b1b6a7
 
 # Translations
 *.mo
@@ -53,6 +64,10 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
+<<<<<<< HEAD
+=======
+db.sqlite3
+>>>>>>> 43b2b27a598828d9ff52a0f59c888956d6b1b6a7
 
 # Flask stuff:
 instance/
@@ -79,6 +94,7 @@ celerybeat-schedule
 # SageMath parsed files
 *.sage.py
 
+<<<<<<< HEAD
 # dotenv
 .env
 
@@ -86,6 +102,16 @@ celerybeat-schedule
 .venv
 venv/
 ENV/
+=======
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+>>>>>>> 43b2b27a598828d9ff52a0f59c888956d6b1b6a7
 
 # Spyder project settings
 .spyderproject
@@ -100,5 +126,8 @@ ENV/
 # mypy
 .mypy_cache/
 <<<<<<< HEAD
+<<<<<<< HEAD
 .idea/
 =======
+=======
+>>>>>>> 43b2b27a598828d9ff52a0f59c888956d6b1b6a7

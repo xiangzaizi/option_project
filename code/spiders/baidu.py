@@ -2,6 +2,7 @@
 from scrapy_option.core.spider import Spider
 from scrapy_option.http.request import Request
 
+
 class BaiduSpider(Spider):
     name = "baidu"
     start_urls = [

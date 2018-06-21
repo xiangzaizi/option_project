@@ -4,13 +4,15 @@ import json
 import re
 from lxml import etree
 
+
 class Response(object):
     """框架内置Response对象"""
-    def __init__(self, url, status_code, headers, body):
+    def __init__(self, url, status_code, headers, body): # , request
         self.url = url
         self.status_code = status_code
         self.headers = headers
         self.body = body
+        # self.request = request
 
     def xpath(self, rule):
         html_obj = etree.HTML(self.body)
